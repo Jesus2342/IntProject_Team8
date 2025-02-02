@@ -5,7 +5,7 @@
 
 ## 🚀 Integrantes
 
-- A01794940 José de Jesús Peña Rodríguez
-- A01283104 Kevin Dueñas Aguirre
-- A01794191 Juan Antonio Chiñas Mata
+- A01794940 José de Jesús Peña Rodríguez.
+- A01283104 Kevin Dueñas Aguirre.
+- A01794191 Juan Antonio Chiñas Mata.
 
