@@ -1,5 +1,14 @@
+import os
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+import importlib
 
 def read_csv(dataset_path):
+    
     current_path = os.getcwd()
     aux_curr_path = current_path
     project_path = aux_curr_path.replace('/notebooks', '')
