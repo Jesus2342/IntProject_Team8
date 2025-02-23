@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from itertools import combinations
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
@@ -40,6 +41,10 @@ def pairs_x(df_col_list, int_list):
     
     return list_x
 
+def var_comb(list_col):
+    x_comb = [list(pair) for pair in combinations(list_col,2)]
+    
+    return x_comb
 
 def get_x(x_pairs, in_df):
     X_out = []
@@ -68,20 +73,29 @@ def wss_list(x):
     return wcss_main
 
 
-def plt_elbow(knss_model, int_list):
-    num_subplots = len(knss_model)
-    fig, axs = plt.subplots(1, num_subplots, figsize=(20, 5))
+def plt_elbow(data_list,var_list):
+    num_rows = 7
+    num_cols = 3
     
-    for i,data in enumerate(knss_model):
-        axs[i].plot(data, marker="o")
-        axs[i].set_title(int_list[i])
     
+    num_plots = len(data_list)
+    fig, axs = plt.subplots(num_rows, num_cols, figsize=(9,12))
+    axs = axs.flatten()
+    
+    for i, data in enumerate(data_list):
+        axs[i].plot(data)
+        axs[i].set_title(var_list[i])
+        
+    # Eliminar ejes vacíos si hay más subplots de los necesarios
+    for j in range(i + 1, len(axs)):
+        fig.delaxes(axs[j])  # Elimina los subplots vacíos
+        
+    plt.tight_layout()  # Ajusta el diseño para que no se sobrepongan
     plt.show()
 
-
-def plot_clusters(num_clusters, x, y, x_pairs_names):
+def multi_plot_clusters(num_clusters, x, y, x_pairs_names):
     
-    fig, axes = plt.subplots(2, 3, figsize=(25, 12))  
+    fig, axes = plt.subplots(7, 3, figsize=(25, 12))  
     axes = axes.flatten() 
     
     
