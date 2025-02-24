@@ -5,6 +5,8 @@ import seaborn as sns
 from itertools import combinations
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import StandardScaler
 
 import importlib
 
@@ -231,5 +233,71 @@ def plot_dbscan_clustering(pairs, df, eps=0.9, min_samples=4):
         fig.colorbar(scatter, ax=ax, label='Cluster Label')
     
     # Final adjustment of the plot layout
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_gmm_clustering(pairs, df, n_clusters=5):
+    """
+    Uses Gaussian Mixture Model (GMM) to group data points based on the provided column pairs 
+    and displays the results in multiple scatter plots.
+    """
+
+    # Determine layout for displaying multiple graphs
+    num_plots = len(pairs)
+    rows = 6
+    cols = 4
+    total_plots = rows * cols  # Max plots that can be displayed
+    fig, axes = plt.subplots(rows, cols, figsize=(25, 4 * rows))  # Set up figure size
+    
+    # Convert axes into a linear list for easy iteration
+    axes = axes.flatten()
+
+    valid_plot_count = 0  # Tracks the number of generated plots
+
+    for pair in pairs:
+        # Ensure selected column indices exist in the dataset
+        if max(pair) >= len(df.columns):
+            print(f"Skipping pair {pair} - column index out of range.")
+            continue  # Ignore invalid columns
+
+        # Retrieve selected columns
+        X = df.iloc[:, list(pair)].values
+        col_names = df.columns[list(pair)]  # Store column names
+        
+        # Normalize data for better clustering
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        # Apply Gaussian Mixture Model
+        gmm = GaussianMixture(n_components=n_clusters, covariance_type='full', random_state=42)
+        Y = gmm.fit_predict(X_scaled)
+        
+        # Ensure we don't exceed available plotting space
+        if valid_plot_count >= total_plots:
+            break  # Stop adding more plots if max reached
+        
+        # Select next available subplot position
+        ax = axes[valid_plot_count]
+        
+        # Generate scatter plot with cluster assignments
+        scatter = ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=Y, cmap='viridis', marker='o')
+        
+        # Set up plot labels
+        ax.set_title(f'GMM Clustering \n ({col_names[0]} & {col_names[1]})')
+        ax.set_xlabel(f'{col_names[0]}')
+        ax.set_ylabel(f'{col_names[1]}')
+        
+        # Attach color legend to represent clusters
+        fig.colorbar(scatter, ax=ax, label='Cluster Label')
+
+        # Increment plot counter
+        valid_plot_count += 1
+
+    # Hide empty subplots if fewer plots were generated than available space
+    for j in range(valid_plot_count, total_plots):
+        axes[j].set_visible(False)
+
+    # Adjust layout to avoid overlapping elements
     plt.tight_layout()
     plt.show()
