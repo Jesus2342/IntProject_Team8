@@ -126,3 +126,110 @@ def multi_plot_clusters(num_clusters, x, y, x_pairs_names):
 
     plt.tight_layout()  
     plt.show()
+
+
+
+
+
+def plot_agglomerative_clustering(pairs, df, n_clusters=5):
+    """
+    Performs agglomerative hierarchical clustering on the specified columns and generates a plot of the results.
+
+    Parameters:
+    - pairs: list of tuples, each tuple contains two column indices to be used for clustering.
+    - df: pandas DataFrame containing the data.
+    - n_clusters: the number of clusters to be desired (default is 5).
+    """
+    
+    # Create a grid of subplots with 6 rows and 4 columns (adjustable)
+    num_plots = len(pairs)
+    rows = 6
+    cols = 4
+    fig, axes = plt.subplots(rows, cols, figsize=(25, 4 * rows))  # Adjust the figure size
+    
+    # Flatten the matrix of axes to make it easier to access
+    axes = axes.flatten()
+    
+    for i, pair in enumerate(pairs):
+        # Extract the columns corresponding to the indices in the pair
+        X = df.iloc[:, list(pair)].values
+        col_names = df.columns[list(pair)]  # Get the column names
+        
+        # Scale the data
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        # Perform agglomerative hierarchical clustering
+        agg_clustering = AgglomerativeClustering(n_clusters=n_clusters)
+        Y = agg_clustering.fit_predict(X_scaled)
+        
+        # Get the axis corresponding to this subplot
+        ax = axes[i]
+        
+        # Plot the points of each cluster
+        scatter = ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=Y, cmap='viridis', marker='o')
+        
+        # Add title and labels with the column names
+        ax.set_title(f'Agglomerative Clustering \n ({col_names[0]} & {col_names[1]})')
+        ax.set_xlabel(f'{col_names[0]}')
+        ax.set_ylabel(f'{col_names[1]}')
+        
+        # Add color bar
+        fig.colorbar(scatter, ax=ax, label='Cluster Label')
+    
+    # Final adjustment of the plot layout
+    plt.tight_layout()
+    plt.show()
+
+
+    
+def plot_dbscan_clustering(pairs, df, eps=0.9, min_samples=4):
+    """
+    Performs DBSCAN clustering on the specified columns and generates a plot of the results.
+
+    Parameters:
+    - pairs: list of tuples, each tuple contains two column indices to be used for clustering.
+    - df: pandas DataFrame containing the data.
+    - eps: maximum distance between two samples for them to be considered as in the same neighborhood (default is 0.015).
+    - min_samples: number of samples in a neighborhood for a point to be considered as a core point (default is 3).
+    """
+    
+    # Create a grid of subplots with 6 rows and 4 columns (adjustable)
+    num_plots = len(pairs)
+    rows = 6
+    cols = 4
+    fig, axes = plt.subplots(rows, cols, figsize=(25, 4 * rows))  # Adjust the figure size
+    
+    # Flatten the matrix of axes to make it easier to access
+    axes = axes.flatten()
+    
+    for i, pair in enumerate(pairs):
+        # Extract the columns corresponding to the indices in the pair
+        X = df.iloc[:, list(pair)].values
+        col_names = df.columns[list(pair)]  # Get the column names
+        
+        # Scale the data
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        # Perform DBSCAN clustering
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+        Y = dbscan.fit_predict(X_scaled)
+        
+        # Get the axis corresponding to this subplot
+        ax = axes[i]
+        
+        # Plot the points of each cluster, where -1 is treated as noise
+        scatter = ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=Y, cmap='viridis', marker='o')
+        
+        # Add title and labels with the column names
+        ax.set_title(f'DBSCAN Clustering\n ({col_names[0]} & {col_names[1]})')
+        ax.set_xlabel(f'{col_names[0]}')
+        ax.set_ylabel(f'{col_names[1]}')
+        
+        # Add color bar
+        fig.colorbar(scatter, ax=ax, label='Cluster Label')
+    
+    # Final adjustment of the plot layout
+    plt.tight_layout()
+    plt.show()
